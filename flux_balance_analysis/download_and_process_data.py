@@ -3,10 +3,6 @@ from collections import defaultdict
 import pandas as pd
 
 
-# TODO: process dnds data
-# TODO: add FBA model downloads
-
-
 def genetic_interaction_data(dataDir):
     download_and_filter_boone_data(
      'http://drygin.ccbr.utoronto.ca/~costanzo2009/sgadata_costanzo2009_intermediateCutoff_101120.txt.gz',
@@ -38,7 +34,6 @@ def download_and_filter_boone_data(url, outpath, dataDir):
     expData['interaction'] = (expData['epsilon'] > 0).map({True: 'positive',
                                                            False: 'negative'})
     expData = expData[['Query ORF', 'Array ORF', 'interaction']]
-
     if os.path.exists(outpath):
         print outpath, 'already exists, skipping'
     else:
@@ -46,9 +41,13 @@ def download_and_filter_boone_data(url, outpath, dataDir):
 
 
 def full_genetic_interaction_data(rawDir='../data/external'):
+    outpath = '../data/processed/genetic_interactions_filtered.csv'
+    if os.path.exists(outpath):
+        print outpath, 'already exists. Skipping.'
+        return
     url = 'http://drygin.ccbr.utoronto.ca/~costanzo2009/sgadata_costanzo2009_rawdata_101120.txt.gz'
     if not os.path.exists(os.path.join(rawDir, url.split('/')[-1][:-3])):
-        os.system('wget -P ' + os.path.join(rawDir, url))
+        os.system('wget -P ' + rawDir + ' ' + url)
         os.system('gunzip ../data/external/sgadata_costanzo2009_rawdata_101120.txt.gz')
     # http://drygin.ccbr.utoronto.ca/~costanzo2009/
     columns = ['Query ORF',
@@ -87,16 +86,13 @@ def full_genetic_interaction_data(rawDir='../data/external'):
             return 'none'
 
     expData['interaction'] = expData.apply(genetic_interaction, axis=1)
-
-    print expData.shape, 'before'   # test
+    nBefore = expData.shape[0]
     # filter to remove gene knockouts that have better growth than wildtype
     expData = expData[((expData['Query SMF'] - 2 * expData['Query SMF std']) <= 1.0) &
                       ((expData['Array SMF'] - 2 * expData['Array SMF std']) <= 1.0)]
-    print expData.shape, 'after'   # test
-
-
+    print 'removed', nBefore - expData.shape[0], 'out of', nBefore
+    print 'knockouts with higher growth than wildtype'
     expData = expData[['Query ORF', 'Array ORF', 'interaction']]
-    outpath = '../data/processed/genetic_interactions_filtered.csv'
     expData.to_csv(outpath, index=False)
 
 
@@ -117,9 +113,17 @@ def essentiality_data(rawDir, outDir):
                     fOut.write(l.split('\t')[1] + '\n')
 
 
-def download_yeast_models(rawDir):
-    # TODO: WRITE THIS FUNCTION
-    return
+def download_yeast_model(rawDir):
+    """Download FBA model."""
+    url = 'https://pilotfiber.dl.sourceforge.net/project/yeast/yeast_7.6.zip'
+    outPath = os.path.join(rawDir, 'yeast_7.6')
+    if os.path.exists(outPath):
+        print outPath, 'already exists. Skipping.'
+        return
+    os.system('wget -P ' + rawDir + ' ' + url)
+    zipPath = os.path.join(rawDir, url.split('/')[-1])
+    os.system('unzip ' + zipPath + ' -d ' + rawDir)
+    os.remove(zipPath)
 
 
 def combine_dnds_data(inDir, outDir):
@@ -129,6 +133,9 @@ def combine_dnds_data(inDir, outDir):
     calculated for s. cer. genes using different yeast species.
     """
     outPath = os.path.join(outDir, 'dnds_rank_scerevisiae.tsv')
+    if os.path.exists(outPath):
+        print outPath, 'already exists. Skipping.'
+        return
     dnds = defaultdict(dict)
     dfs = {}
     for fileName in os.listdir(inDir):
@@ -148,7 +155,7 @@ def combine_dnds_data(inDir, outDir):
 def main():
     rawDir = '../data/external'
     processedDir = '../data/processed'
-    download_yeast_models(rawDir)
+    download_yeast_model(rawDir)
     essentiality_data(rawDir, processedDir)
     genetic_interaction_data(rawDir)
     full_genetic_interaction_data()
