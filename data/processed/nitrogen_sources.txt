@@ -1,0 +1,34 @@
+ammonium
+gamma-aminobutyrate
+adenine
+adenosine
+L-alanine
+allantoin
+allantoate
+S-adenosyl-L-methionine
+L-arginine
+L-asparagine
+L-aspartate
+cytosine
+cytidine
+deoxycytidine
+alpha-D-glucosamine 6-phosphate
+L-glutamine
+L-glutamate
+glycine
+guanosine
+guanine
+L-isoleucine
+L-leucine
+ornithine
+adenosine 3',5'-bismonophosphate
+L-phenylalanine
+L-proline
+putrescine
+L-serine
+spermidine
+spermine
+L-threonine
+L-tryptophan
+urea
+L-valine

@@ -1,0 +1,6 @@
+cobra==0.4.1
+numpy==1.11.2
+python-libsbml==5.13.0
+scipy==0.18.1
+six==1.10.0
+wsgiref==0.1.2
