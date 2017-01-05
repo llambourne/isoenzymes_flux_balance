@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/78135650.svg)](https://zenodo.org/badge/latestdoi/78135650)
+
 This is the code used in the paper:
 **Upon accounting for the impact of isoenzyme loss, gene deletion costs anticorrelate with their evolutionary rates**, published in PLOS ONE.
 
