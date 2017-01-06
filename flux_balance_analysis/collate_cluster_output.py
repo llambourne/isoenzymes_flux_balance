@@ -1,8 +1,5 @@
 """Script to read in all the costs and write to csv."""
 
-# TODO: check for wildtype growth when file not found
-
-
 import os
 import cPickle as pickle
 from collections import defaultdict

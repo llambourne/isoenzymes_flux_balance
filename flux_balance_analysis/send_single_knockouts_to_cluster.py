@@ -2,13 +2,9 @@ import sys
 import os
 
 """
-
 Sends jobs to the computer cluster that calculate the cost for every gene
 knockout for a simulation of a particular minimal media made up of one
 metabolite from the carbon source list and one from the nitrogen source list.
-
-TODO: - check for existance of output file before sending job
-      - check for wildtype growth?
 """
 
 modelPath = '../data/external/yeast_7.6/yeast_7.6.xml'
@@ -20,7 +16,7 @@ cmd = 'qsub -V -b y "python single_knockouts.py '
 outDir = '../models/' + modelPath.split('/')[-1][:-4] + '/cluster_output'
 for carbon in carbonSourceNames:
     for nitrogen in nitrogenSourceNames:
-        outPath = os.path.join(outDir, ('gene_loss_cost_' + 
+        outPath = os.path.join(outDir, ('gene_loss_cost_' +
                         carbon + '_AND_' + nitrogen + '.pkl').replace(' ', '_'))
         args = modelPath + ' \\"' + carbon + '\\" \\"' + nitrogen + '\\""'
         if not os.path.exists(outPath):

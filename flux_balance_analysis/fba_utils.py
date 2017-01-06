@@ -147,7 +147,6 @@ def load_sd_minus_his(modelPath):
         cobra.model: FBA model.
 
     """
-    #TODO: add a bunch of checks here
     model = cobra.io.read_sbml_model(modelPath)
     # Note: different models have different names for their reactions
     sdMinusHis = set([i+' exchange' for i in ['biotin', 'choline',
@@ -188,7 +187,7 @@ def load_media(modelPath, mediaName):
                       'L-tryptophan', 'L-tyrosine', 'L-valine'])
     ypd = sdMinusHis.union(set(['L-histodine', 'riboflavin', 'thiamine(1+)',
                                 'thymidine', 'nicotinate', '4-aminobenzoate',
-                                 '(R)-pantothenate', 'pyridoxine']))
+                                '(R)-pantothenate', 'pyridoxine']))
     nutrients = {'sd_minus_his': sdMinusHis,
                  'ypd': ypd}
     if mediaName not in nutrients:
@@ -199,6 +198,6 @@ def load_media(modelPath, mediaName):
     nutrientRxns = set([i+' exchange' for i in nutrients[mediaName]])
     exchangeReactions = get_exchange_reactions(model)
     for r in exchangeReactions:
-        if r.name in sdMinusHis:
+        if r.name in nutrientRxns:
             r.lower_bound = -10.
     return model
