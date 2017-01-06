@@ -1,7 +1,9 @@
 import os
 from collections import defaultdict
+from warnings import filterwarnings
 import pandas as pd
-
+import cobra
+from single_knockouts import get_exchange_reactions
 
 def genetic_interaction_data(dataDir):
     download_and_filter_boone_data(
@@ -126,6 +128,46 @@ def download_yeast_model(rawDir):
     os.remove(zipPath)
 
 
+def get_blocked_reactions(modelPath):
+    """Write out list of blocked reactions.
+
+    A blocked reaction is defined as one for with no flux
+    can go through in the case when all exchange reactions
+    (i.e. all intake of nutrients) are open.
+
+    Args:
+        modelPath (str): path to FBA model xml file.
+
+    """
+    outDir = '../models/yeast_7.6'
+    if not os.path.exists(outDir):
+        os.makedirs(outDir)
+    outPath = os.path.join(outDir, 'blocked_genes.txt')
+    if os.path.exists(outPath):
+        print outPath, 'already exists. Skipping.'
+        return
+    filterwarnings('ignore', 'charge of s_[0-9][0-9][0-9][0-9] is not a number ()')
+    filterwarnings('ignore', 'uppercase AND/OR found in rule ')
+    model = cobra.io.read_sbml_model(modelPath)
+    exchangeReactions = get_exchange_reactions(model)
+    for r in exchangeReactions:
+        r.lower_bound = -10.
+    blockedReactions = []
+    for reaction in model.reactions:
+        model.objective = reaction.id
+        if model.optimize(objective_sense='maximize').f == 0. and \
+           model.optimize(objective_sense='minimize').f == 0.:
+            blockedReactions.append(reaction.id)
+    print len(blockedReactions), 'blocked reactions'
+    blockedGenes = []
+    for gene in model.genes:
+        if all([r.id in blockedReactions for r in gene.reactions]):
+            blockedGenes.append(gene.id)
+    print len(blockedGenes), 'blocked genes'
+    with open(outPath, 'w') as f:
+        f.write('\n'.join(blockedGenes))
+
+
 def combine_dnds_data(inDir, outDir):
     """Average rank of evolutionary rate.
 
@@ -160,6 +202,7 @@ def main():
     genetic_interaction_data(rawDir)
     full_genetic_interaction_data()
     combine_dnds_data(os.path.join(rawDir, 'dnds'), processedDir)
+    get_blocked_reactions(os.path.join(rawDir, 'yeast_7.6/yeast_7.6.xml'))
 
 
 if __name__ == '__main__':
