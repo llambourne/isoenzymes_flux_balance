@@ -42,6 +42,9 @@ class TestFBAModel:
             allRules = allRules.replace(geneName, '')
         assert allRules == '', 'gene reaction rules should contain only |gene names|and|or|()|'
 
+    def test_each_gene_has_at_least_one_gene_to_reaction_rule(self):
+        assert all([len(g.reactionRules) > 0 for g in self.genes.values()])
+
     def test_function_loss_equals_gene_loss_in_simple_cases(self):
         assert all([g.old_and_new_costs_identical() for g in self.genes.values() if
                     g.is_simple_single_function()])

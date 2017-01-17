@@ -13,17 +13,21 @@ assumptions in the cost calculations.
 
 `send_*_knockouts_to_cluster.py`: Calculates growth for all single/double gene knockouts using the Open Grid Scheduler batch system on a computing cluster.
 
-`collate_cluster_output.py`
+`collate_cluster_output.py`: Run once after all batch jobs have finished to combine their outputs.
 
 The figures related to the single knockouts are produced in the jupyter notebook `examine_correlations.ipynb` and the figures related to the double knockouts are produced in `epistasis.ipynb`.
 
 ### Dependancies
 
-The FBA requires a linear programming solver.
-I've used gurobi, which requires signing up for an
+Uses Python 2.7. Uses the [cobrapy](opencobra.github.io/cobrapy) package. The FBA requires a linear programming solver.
+I've used [Gurobi](www.gurobi.com), which requires signing up for an
 account on their website before you can install the
 software.
 The other python package dependancies are listed in `requirements.txt`.
+
+### Using other FBA models
+
+The code is written to analyze the [yeast 7.6](https://sourceforge.net/projects/yeast/files/) FBA model. Since there are no standardized reaction IDs across different models, you need to edit the `carbon_sources.txt` and `nitrogen_sources.txt` files by hand to have the correct names for the exchange reactions for the new model.
 
 ### Boston University cluster
 
