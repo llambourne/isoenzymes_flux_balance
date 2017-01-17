@@ -12,4 +12,5 @@ install:
   - travis_wait 30 pip install -r requirements.txt
 script:
   - cd flux_balance_analysis/
+  - python download_and_process_data.py
   - pytest
